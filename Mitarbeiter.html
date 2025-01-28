@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #008000;
+        }
+        .navbar .nav-link {
+            color: white;
+            font-weight: bold;
+        }
+        .navbar .nav-link:hover {
+            color: #d4d4d4;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .navbar-brand img {
+            height: 30px;
+            margin: 0 10px;
+        }
+
+        .navbar-dropdown{
+            flex: 1;
+            max-width: 90%;
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu{
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px;
+            margin-top: 2px;
+            width: auto;
+            right: 0;
+            left: auto;
+        }
+        .card-container {
+            position: relative;
+            top: 20px;
+            left: 20px;
+            width: 18rem;
+        }
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <!-- Left -->
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="/fuhrpark">Fuhrpark</a>
+                <a class="nav-link" href="/mitarbeiter">Mitarbeiter</a>
+                <a class="nav-link" href="/felder">Felder</a>
+            </div>
+
+            <!-- Center -->
+            <a href="/" class="navbar-brand mx-auto">
+                Smart
+                <img src="{{ url_for('static', filename='images/sm_logo.png') }}" alt="Logo">
+                Farm
+            </a>
+
+            <!-- Right -->
+            <div class="navbar-nav ms-auto">
+                <div class="navbar-dropdown">
+                <button type="button" class="btn btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                Account
+                </button>
+                <ul class="dropdown-menu">
+                <li><button type="button" class="btn btn-success" id="signInButton">Einloggen</button></li>
+                <li><a href="/register" class="btn btn-primary" id="registerButton">Registrieren</a></li>
+                </ul>
+                </div>
+                <a class="nav-link" href="/settings" target="_blank">Einstellungen</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- NavBar Modal -->
+    <div class="modal fade" id="NavBarModal" tabindex="-1" aria-labelledby="NavBarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NavBarModalLabel">Einloggen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="exampleDropdownFormEmail2" class="form-label">Email addresse</label>
+                            <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@beispiel.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleDropdownFormPassword2" class="form-label">Passwort</label>
+                            <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Passwort">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+                                <label class="form-check-label" for="dropdownCheck2">
+                                    Einstellungen speichern
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Anmelden</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Mitarbeiter Anlegen Button -->
+        <button type="button" class="btn btn-secondary" style="position: absolute; top: 70px; left: 10px;" data-toggle="modal" data-target="#mitarbeiterModal">Mitarbeiter hinzufügen</button>
+
+         <h1>Mitarbeiter</h1>
+        <div class="row">
+        {% for mitarbeiter in mitarbeiter %}
+        <div class="col-sm-4">
+            <!-- Mitarbeiter Card -->
+            <div class="card card-container">
+                <img src="{{ url_for('static', filename=mitarbeiter.image) }}" class="card-img-top" alt="{{ mitarbeiter.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ mitarbeiter.name }}</h5>
+                    <p class="card-text">{{ mitarbeiter.email }}</p>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{ mitarbeiter.id }}">Informationen</button>
+                </div>
+            </div>
+
+            <!-- Modal für Mitarbeiter Information -->
+            <div class="modal fade" id="modal{{ mitarbeiter.id }}" tabindex="-1" aria-labelledby="modalLabel{{ mitarbeiter.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel{{ mitarbeiter.id }}">{{ mitarbeiter.name }} Informationen</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Email:</strong> {{ mitarbeiter.email }}</p>
+                            <p><strong>Adresse:</strong> {{ mitarbeiter.strasse }} {{ mitarbeiter.hausnummer }}, {{ mitarbeiter.plz }} {{ mitarbeiter.ort }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" onclick="deleteMitarbeiter({{ mitarbeiter.id }})">Löschen</button>
+                            <button type="button" class="btn btn-primary" onclick="editMitarbeiter({{ mitarbeiter.id }})">Bearbeiten</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    </div>
+
+
+
+    <!-- Mitarbeiter Modal -->
+    <div class="modal fade" id="mitarbeiterModal" tabindex="-1" role="dialog" aria-labelledby="mitarbeiterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mitarbeiterModalLabel">Mitarbeiter anlegen</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form um Mitarbeiter hinzuzufügen -->
+                    <form id="mitarbeiterform" method="POST" action="/add_mitarbeiter" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="passwort">Passwort:</label>
+                            <input type="password" class="form-control" id="passwort" name="passwort" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ort">Ort:</label>
+                            <input type="text" class="form-control" id="ort" name="ort" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plz">PLZ:</label>
+                            <input type="text" class="form-control" id="plz" name="plz" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="strasse">Strasse:</label>
+                            <input type="text" class="form-control" id="strasse" name="strasse" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hausnummer">Hausnummer:</label>
+                            <input type="text" class="form-control" id="hausnummer" name="hausnummer" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Bild:</label>
+                            <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mitarbeiter Bearbeiten Modal -->
+    <div class="modal fade" id="editMitarbeiterModal" tabindex="-1" aria-labelledby="editMitarbeiterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMitarbeiterModalLabel">Mitarbeiter bearbeiten (ohne Funktion)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMitarbeiterForm">
+                        <div class="form-group">
+                            <label for="editMitarbeiterName">Name:</label>
+                            <input type="text" class="form-control" id="editMitarbeiterName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMitarbeiterEmail">E-Mail:</label>
+                            <input type="text" class="form-control" id="editMitarbeiterEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMitarbeiterOrt">Ort:</label>
+                            <input type="text" class="form-control" id="editMitarbeiterOrt" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMitarbeiterPLZ">PLZ:</label>
+                            <input type="text" class="form-control" id="editMitarbeiterPLZ" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMitarbeiterStrasse">Strasse:</label>
+                            <input type="text" class="form-control" id="editMitarbeiterStrasse" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMitarbeiterHausnummer">Hausnummer:</label>
+                            <input type="text" class="form-control" id="editMitarbeiterHausnummer" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="saveEditMitarbeiter()">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and JQuery-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+
+    <script>
+    document.getElementById('signInButton').addEventListener('click', function() {
+
+        var myModal = new bootstrap.Modal(document.getElementById('NavBarModal'));
+        myModal.show();
+    });
+    </script>
+
+    <script>
+    function editMitarbeiter(mitarbeiterId) {
+        fetch(`/get_mitarbeiter/${mitarbeiterId}`)
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("editMitarbeiterName").value = data.name;
+                document.getElementById("editMitarbeiterEmail").value = data.email;
+                document.getElementById("editMitarbeiterOrt").value = data.ort;
+                document.getElementById("editMitarbeiterPLZ").value = data.plz;
+                document.getElementById("editMitarbeiterStrasse").value = data.strasse;
+                document.getElementById("editMitarbeiterHausnummer").value = data.hausnummer;
+
+
+                const modal = document.getElementById('editMitarbeiterModal');
+                modal.setAttribute('data-mitarbeiter-id', mitarbeiterId);
+
+
+                const bootstrapModal = new bootstrap.Modal(modal);
+                bootstrapModal.show();
+            })
+            .catch(error => console.error("Error fetching Mitarbeiter data:", error));
+    }
+
+    function saveEditMitarbeiter() {
+        const mitarbeiterId = document.getElementById("editMitarbeiterModal").getAttribute("data-mitarbeiter-id");
+        const updatedData = {
+            name: document.getElementById("editMitarbeiterName").value,
+            email: document.getElementById("editMitarbeiterEmail").value,
+            ort: document.getElementById("editMitarbeiterOrt").value,
+            plz: document.getElementById("editMitarbeiterPLZ").value,
+            strasse: document.getElementById("editMitarbeiterStrasse").value,
+            hausnummer: document.getElementById("editMitarbeiterHausnummer").value
+        };
+
+        fetch(`/update_mitarbeiter/${mitarbeiterId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert("Failed to update Mitarbeiter.");
+                }
+            })
+            .catch(error => console.error("Error saving Mitarbeiter:", error));
+    }
+
+    function deleteMitarbeiter(mitarbeiterId) {
+        if (confirm("Sind Sie sicher, dass Sie diesen Mitarbeiter löschen möchten?")) {
+            fetch(`/delete_mitarbeiter/${mitarbeiterId}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert("Failed to delete Mitarbeiter");
+                    }
+                })
+                .catch(error => console.error("Error deleting Mitarbeiter:", error));
+        }
+    }
+    </script>
+
+</body>
+</html>

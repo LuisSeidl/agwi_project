@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuhrpark Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #008000;
+        }
+        .navbar .nav-link {
+            color: white;
+            font-weight: bold;
+        }
+        .navbar .nav-link:hover {
+            color: #d4d4d4;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .navbar-brand img {
+            height: 30px;
+            margin: 0 10px;
+        }
+        .navbar-dropdown{
+            flex: 1;
+            max-width: 90%;
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu{
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px;
+            margin-top: 2px;
+            width: auto;
+            right: 0;
+            left: auto;
+        }
+        .card-container {
+            position: relative;
+            top: 20px;
+            left: 20px;
+            width: 18rem;
+        }
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <!-- Left -->
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="/fuhrpark">Fuhrpark</a>
+                <a class="nav-link" href="/mitarbeiter">Mitarbeiter</a>
+                <a class="nav-link" href="/felder">Felder</a>
+            </div>
+
+            <!-- Center -->
+            <a href="/" class="navbar-brand mx-auto">
+                Smart
+                <img src="{{ url_for('static', filename='images/sm_logo.png') }}" alt="Logo">
+                Farm
+            </a>
+
+            <!-- Right -->
+            <div class="navbar-nav ms-auto">
+                <div class="navbar-dropdown">
+                <button type="button" class="btn btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                Account
+                </button>
+                <ul class="dropdown-menu">
+                <li><button type="button" class="btn btn-success" id="signInButton">Einloggen</button></li>
+                <li><a href="/register" class="btn btn-primary" id="registerButton">Registrieren</a></li>
+                </ul>
+                </div>
+                <a class="nav-link" href="/settings" target="_blank">Einstellungen</a>
+                </div>
+        </div>
+    </nav>
+
+    <!-- NavBar Modal -->
+<div class="modal fade" id="NavBarModal" tabindex="-1" aria-labelledby="NavBarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NavBarModalLabel">Einloggen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="exampleDropdownFormEmail2" class="form-label">Email addresse</label>
+                            <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@beispiel.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleDropdownFormPassword2" class="form-label">Passwort</label>
+                            <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Passwort">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+                                <label class="form-check-label" for="dropdownCheck2">
+                                    Einstellungen speichern
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Anmelden</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Traktor Anlegen Button -->
+        <button type="button" class="btn btn-secondary" style="position: absolute; top: 70px; left: 10px;" data-toggle="modal" data-target="#traktorModal">Traktor anlegen</button>
+         <h1>Fahrzeuge</h1>
+    <div class="row">
+        {% for fahrzeug in fahrzeuge %}
+        <div class="col-sm-4">
+            <!-- Fahrzeug Card -->
+            <div class="card card-container">
+                <img src="{{ url_for('static', filename=fahrzeug.image) }}" class="card-img-top" alt="{{ fahrzeug.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ fahrzeug.name }}</h5>
+                    <p class="card-text">{{ fahrzeug.kategorie }} - {{ fahrzeug.leistung }} PS</p>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{ fahrzeug.id }}">Informationen</button>
+                </div>
+            </div>
+
+            <!-- Modal für Fahrzeug Information -->
+            <div class="modal fade" id="modal{{ fahrzeug.id }}" tabindex="-1" aria-labelledby="modalLabel{{ fahrzeug.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel{{ fahrzeug.id }}">{{ fahrzeug.name }} Informationen</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Kategorie:</strong> {{ fahrzeug.kategorie }}</p>
+                            <p><strong>Leistung:</strong> {{ fahrzeug.leistung }} PS</p>
+                            <p><strong>GPS Daten:</strong> {{ fahrzeug.gps_daten }}</p>
+                            <p><strong>Zustand:</strong> {{ fahrzeug.zustand }}</p>
+                            <p><strong>Service Datum:</strong> {{ fahrzeug.service }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" onclick="deleteFahrzeug({{ fahrzeug.id }})">Löschen</button>
+                            <button type="button" class="btn btn-primary" onclick="editFahrzeug({{ fahrzeug.id }})">Bearbeiten</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <!-- Traktor anlegen modal -->
+    <div class="modal fade" id="traktorModal" tabindex="-1" role="dialog" aria-labelledby="traktorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="traktorModalLabel">Traktor anlegen</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <form id="traktorForm" method="POST" action="/add_fahrzeug" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="kategorie">Kategorie:</label>
+                                <input type="text" class="form-control" id="kategorie" name="kategorie" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="leistung">Leistung:</label>
+                                <input type="number" class="form-control" id="leistung" name="leistung" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stunden">Stunden:</label>
+                                <input type="number" step="0.1" class="form-control" id="stunden" name="stunden" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gps_daten">GPS Daten:</label>
+                                <input type="text" class="form-control" id="gps_daten" name="gps_daten" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zustand">Zustand:</label>
+                                <select class="form-control" id="zustand" name="zustand" required>
+                                    <option value="neu">Neu</option>
+                                    <option value="gebraucht">Gebraucht</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="image">Bild:</label>
+                                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Speichern</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fahrzeug Bearbeiten Modal -->
+    <div class="modal fade" id="editFahrzeugModal" tabindex="-1" aria-labelledby="editFahrzeugModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFahrzeugModalLabel">Fahrzeug bearbeiten (ohne Funktion)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFahrzeugForm">
+                        <div class="form-group">
+                            <label for="editFahrzeugName">Name:</label>
+                            <input type="text" class="form-control" id="editFahrzeugName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFahrzeugKategorie">Kategorie:</label>
+                            <input type="text" class="form-control" id="editFahrzeugKategorie" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFahrzeugLeistung">Leistung:</label>
+                            <input type="number" class="form-control" id="editFahrzeugLeistung" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFahrzeugStunden">Stunden:</label>
+                            <input type="text" class="form-control" id="editFahrzeugStunden" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFahrzeugGPS">GPS Daten:</label>
+                            <input type="text" class="form-control" id="editFahrzeugGPS" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFahrzeugZustand">Zustand:</label>
+                            <select class="form-control" id="editFahrzeugZustand" required>
+                                <option value="neu">Neu</option>
+                                <option value="gebraucht">Gebraucht</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="saveEditFahrzeug()">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Bootstrap JS and JQuery-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+
+
+
+    <script>
+    document.getElementById('signInButton').addEventListener('click', function() {
+
+        var myModal = new bootstrap.Modal(document.getElementById('NavBarModal'));
+        myModal.show();
+    });
+    </script>
+
+    <script>
+    function editFahrzeug(fahrzeugId) {
+        fetch(`/get_fahrzeug/${fahrzeugId}`)
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("editFahrzeugName").value = data.name;
+                document.getElementById("editFahrzeugKategorie").value = data.kategorie;
+                document.getElementById("editFahrzeugLeistung").value = data.leistung;
+                document.getElementById("editFahrzeugStunden").value = data.stunden;
+                document.getElementById("editFahrzeugGPS").value = data.gps_daten;
+                document.getElementById("editFahrzeugZustand").value = data.zustand;
+
+
+                const modal = document.getElementById('editFahrzeugModal');
+                modal.setAttribute('data-fahrzeug-id', fahrzeugId);
+
+
+                const bootstrapModal = new bootstrap.Modal(modal);
+                bootstrapModal.show();
+            })
+            .catch(error => console.error("Error fetching Fahrzeug data:", error));
+    }
+
+    function saveEditFahrzeug() {
+        const fahrzeugId = document.getElementById("editFahrzeugModal").getAttribute("data-fahrzeug-id");
+        const updatedData = {
+            name: document.getElementById("editFahrzeugName").value,
+            kategorie: document.getElementById("editFahrzeugKategorie").value,
+            leistung: parseInt(document.getElementById("editFahrzeugLeistung").value),
+            stunden: parseFloat(document.getElementById("editFahrzeugStunden").value),
+            gps_daten: document.getElementById("editFahrzeugGPS").value,
+            zustand: document.getElementById("editFahrzeugZustand").value
+        };
+
+        fetch(`/update_fahrzeug/${fahrzeugId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert("Failed to update Fahrzeug.");
+                }
+            })
+            .catch(error => console.error("Error saving Fahrzeug:", error));
+    }
+
+    function deleteFahrzeug(fahrzeugId) {
+        if (confirm("Sind Sie sicher, dass Sie dieses Fahrzeug löschen möchten?")) {
+            fetch(`/delete_fahrzeug/${fahrzeugId}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert("Failed to delete Fahrzeug");
+                    }
+                })
+                .catch(error => console.error("Error deleting Fahrzeug:", error));
+        }
+    }
+    </script>
+
+
+
+</body>
+</html>

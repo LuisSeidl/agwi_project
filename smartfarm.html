@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarm Navigation Bar</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #008000;
+        }
+        .navbar .nav-link {
+            color: white;
+            font-weight: bold;
+        }
+        .navbar .nav-link:hover {
+            color: #d4d4d4;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .navbar-brand img {
+            height: 30px;
+            margin: 0 10px;
+        }
+        .auftrag-card {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        margin: 20px auto;
+        max-width: 2000px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .auftrag-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .auftrag-status {
+            position: relative;
+            flex: 0 0 auto;
+        }
+        .auftrag-title {
+            flex: 1;
+            text-align: left;
+            padding-left: 10px;
+        }
+        .auftrag-container {
+            padding: 0 20px;
+            max-width: 2000px;
+            margin: 0 auto;
+        }
+        .navbar-dropdown{
+            flex: 1;
+            max-width: 90%;
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px;
+            width: 100%;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown .btn {
+            width: 100%;
+            font-weight: bold;
+        }
+        .btn-danger {
+        background-color: gray;
+        color: white;
+        }
+
+        .btn-success {
+            background-color: green;
+            color: white;
+        }
+        .action-button {
+            flex: 1;
+            max-width: 20%;
+            text-align: right;
+        }
+        .button-section {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .button-section .btn {
+            position: relative;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .button-section .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: black;
+            color: white;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <!-- Left -->
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="/fuhrpark">Fuhrpark</a>
+                <a class="nav-link" href="/mitarbeiter">Mitarbeiter</a>
+                <a class="nav-link" href="/felder">Felder</a>
+            </div>
+
+            <!-- Center -->
+            <a href="/" class="navbar-brand mx-auto">
+                Smart
+                <img src="{{ url_for('static', filename='images/sm_logo.png') }}" alt="Logo">
+                Farm
+            </a>
+
+            <!-- Right -->
+            <div class="navbar-nav ms-auto">
+                <div class="navbar-dropdown">
+                <button type="button" class="btn btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                Account
+                </button>
+                <ul class="dropdown-menu">
+                <li><button type="button" class="btn btn-success" id="signInButton">Einloggen</button></li>
+                <li><a href="/register" class="btn btn-primary" id="registerButton">Registrieren</a></li>
+                </ul>
+                </div>
+                <a class="nav-link" href="/settings" target="_blank">Einstellungen</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- NavBar -->
+    <div class="modal fade" id="NavBarModal" tabindex="-1" aria-labelledby="NavBarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NavBarModalLabel">Einloggen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="exampleDropdownFormEmail2" class="form-label">Email addresse</label>
+                            <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@beispiel.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleDropdownFormPassword2" class="form-label">Passwort</label>
+                            <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Passwort">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+                                <label class="form-check-label" for="dropdownCheck2">
+                                    Einstellungen speichern
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Anmelden</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Buttons -->
+    <div class="button-section">
+
+        <!-- Left -->
+        <button class="btn btn-success">
+            Alle Aufträge
+            <span class="badge">99</span>
+        </button>
+
+        <!-- Right Button, triggers modal -->
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Neuen Auftrag anlegen
+        </button>
+
+        <!-- Modal für neuen Auftrag Anlegen-->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Auftrag anlegen</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="angestellter" class="form-label">Angestellter:</label>
+                  <select class="form-control" id="angestellter">
+                    {% for angestellter in angestellte %}
+                      <option value="{{ angestellter[0] }}">{{ angestellter[1] }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="arbeitsort" class="form-label">Arbeitsort:</label>
+                  <select class="form-control" id="arbeitsort">
+                    {% for arbeitsort in arbeitsorte %}
+                      <option value="{{ arbeitsort[0] }}">{{ arbeitsort[0] }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="arbeitsart" class="form-label">Arbeitsart:</label>
+                  <select class="form-control" id="arbeitsart">
+                    {% for arbeitsart in arbeitsarten %}
+                      <option value="{{ arbeitsart[0] }}">{{ arbeitsart[1] }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="zeit" class="form-label">Zeit:</label>
+                  <input type="datetime-local" class="form-control" id="zeit" placeholder="Zeit eingeben">
+                </div>
+
+                <div class="mb-3">
+                  <label for="fahrzeug" class="form-label">Fahrzeug:</label>
+                  <select class="form-control" id="fahrzeug">
+                    {% for fahrzeug in fahrzeuge %}
+                      <option value="{{ fahrzeug[0] }}">{{ fahrzeug[1] }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-success" onclick="saveChanges()">Auftrag anlegen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <!-- Text -->
+    <div class="auftrag-container">
+        <!-- Loop durch Auftrag -->
+        {% for auftrag in auftraege %}
+            <div class="auftrag-card">
+                <div class="auftrag-row">
+                    <!-- Dropdown für Status Update -->
+                    <div class="auftrag-status">
+                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                id="dropdownMenuButton{{ auftrag.id }}"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                data-status="{{ auftrag.status }}">
+                            {{ auftrag.status }}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ auftrag.id }}">
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus(this, {{ auftrag.id }}, 'Unbearbeitet')">Unbearbeitet</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus(this, {{ auftrag.id }}, 'In Bearbeitung')">In Bearbeitung</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="updateStatus(this, {{ auftrag.id }}, 'Abgeschlossen')">Abgeschlossen</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Auftragstitel -->
+                    <div class="auftrag-title">
+                        <strong>
+                            {{ auftrag.angestellter_name }} fährt am {{ auftrag.formatted_date }} um {{ auftrag.formatted_time }} mit {{ auftrag.fahrzeug_name }}
+                            zu Feld {{ auftrag.id }} und macht Arbeit {{ auftrag.arbeitsart_name }}.
+
+                        </strong>
+                    </div>
+
+                    <!-- Auftrag Bearbeiten Button -->
+                    <div class="action-button">
+                        <button class="btn btn-success" onclick="editAuftrag({{ auftrag.id }})">Auftrag bearbeiten</button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Keine Aufträge gefunden.</p> <!-- Display message falls keine aufträge vorhanden -->
+        {% endfor %}
+    </div>
+
+    <!-- Modal für auftrag bearbeiten -->
+    <div class="modal fade" id="editAuftragModal" tabindex="-1" aria-labelledby="editAuftragModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editAuftragModalLabel">Auftrag bearbeiten</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editAngestellter" class="form-label">Angestellter:</label>
+                        <select class="form-control" id="editAngestellter">
+                            {% for angestellter in angestellte %}
+                                <option value="{{ angestellter[0] }}">{{ angestellter[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editArbeitsort" class="form-label">Arbeitsort:</label>
+                        <select class="form-control" id="editArbeitsort">
+                            {% for arbeitsort in arbeitsorte %}
+                                <option value="{{ arbeitsort[0] }}">{{ arbeitsort[0] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editArbeitsart" class="form-label">Arbeitsart:</label>
+                        <select class="form-control" id="editArbeitsart">
+                            {% for arbeitsart in arbeitsarten %}
+                                <option value="{{ arbeitsart[0] }}">{{ arbeitsart[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editZeit" class="form-label">Zeit:</label>
+                        <input type="datetime-local" class="form-control" id="editZeit">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editFahrzeug" class="form-label">Fahrzeug:</label>
+                        <select class="form-control" id="editFahrzeug">
+                            {% for fahrzeug in fahrzeuge %}
+                                <option value="{{ fahrzeug[0] }}">{{ fahrzeug[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteAuftragButton">Auftrag Löschen</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                    <button type="button" class="btn btn-success" id="saveEditAuftragButton">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <!-- Bootstrap JS (Optional for Navbar functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <script>
+    document.getElementById('signInButton').addEventListener('click', function() {
+        // Code to show modal goes here
+        // Example using Bootstrap modal:
+        var myModal = new bootstrap.Modal(document.getElementById('NavBarModal'));
+        myModal.show();
+    });
+    </script>
+
+    <script>
+    function updateStatus(element, auftragId, newStatus) {
+    fetch(`/update_status/${auftragId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Response from server:', data);
+    if (data.success) {
+        const dropdownButton = document.getElementById(`dropdownMenuButton${auftragId}`);
+        if (dropdownButton) {
+            dropdownButton.textContent = newStatus;
+
+
+            if (newStatus === 'Unbearbeitet') {
+                dropdownButton.classList.remove('btn-success', 'btn-warning', 'btn-secondary');
+                dropdownButton.classList.add('btn-danger');  // Red
+            } else if (newStatus === 'In Bearbeitung') {
+                dropdownButton.classList.remove('btn-danger', 'btn-success', 'btn-secondary');
+                dropdownButton.classList.add('btn-warning');  // Orange
+            } else if (newStatus === 'Abgeschlossen') {
+                dropdownButton.classList.remove('btn-danger', 'btn-warning', 'btn-secondary');
+                dropdownButton.classList.add('btn-success');  // Green
+            }
+        } else {
+            console.error(`Button with ID dropdownMenuButton${auftragId} not found.`);
+        }
+    } else {
+        alert('Failed to update status');
+    }
+    })
+    .catch(error => {
+        console.error('Error updating status:', error);
+    });
+    }
+    </script>
+
+    <script>
+
+        function updateButtonColor(button, status) {
+            switch (status) {
+                case 'Unbearbeitet':
+                    button.classList.remove('btn-success', 'btn-warning', 'btn-danger');
+                    button.classList.add('btn-secondary');
+                    break;
+                case 'In Bearbeitung':
+                    button.classList.remove('btn-secondary', 'btn-success', 'btn-danger');
+                    button.classList.add('btn-warning');
+                    break;
+                case 'Abgeschlossen':
+                    button.classList.remove('btn-secondary', 'btn-warning', 'btn-success');
+                    button.classList.add('btn-success');
+                    break;
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.dropdown-toggle');
+            buttons.forEach(button => {
+                const status = button.getAttribute('data-status');
+                updateButtonColor(button, status);
+            });
+        });
+    </script>
+
+    <script>
+    function saveChanges() {
+
+        var angestellter = document.getElementById("angestellter").value;
+        var arbeitsort = document.getElementById("arbeitsort").value;
+        var arbeitsart = document.getElementById("arbeitsart").value;
+        var zeit = document.getElementById("zeit").value;
+        var fahrzeug = document.getElementById("fahrzeug").value;
+
+
+        fetch("/add_auftrag", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                angestellter_id: angestellter,
+                arbeitsort_id: arbeitsort,
+                arbeitsart_id: arbeitsart,
+                zeit: zeit,
+                fahrzeug_id: fahrzeug
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response from server:", data);
+
+
+            if (data.message) {
+                console.log("Auftrag added successfully!");
+
+
+                $('#exampleModal').modal('hide');
+
+
+                location.reload();
+            } else if (data.error) {
+
+                console.error("Error from server:", data.error);
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error adding Auftrag:", error);
+            alert("Error: " + error);
+        });
+    }
+    </script>
+
+    <script>
+       function editAuftrag(auftragId) {
+
+            fetch(`/get_auftrag/${auftragId}`)
+                .then(response => response.json())
+                .then(data => {
+
+                    document.getElementById("editAngestellter").value = data.angestellter_id;
+                    document.getElementById("editArbeitsort").value = data.arbeitsort_id;
+                    document.getElementById("editArbeitsart").value = data.arbeitsart_id;
+
+
+                    if (data.zeit) {
+                        const datetime = new Date(data.zeit);
+                        const formattedDatetime = datetime.toISOString().slice(0, 16);
+                        document.getElementById("editZeit").value = formattedDatetime;
+                    }
+
+                    document.getElementById("editFahrzeug").value = data.fahrzeug_id;
+
+
+                    document.getElementById("saveEditAuftragButton").onclick = () => saveEditAuftrag(auftragId);
+                    document.getElementById("deleteAuftragButton").onclick = () => deleteAuftrag(auftragId);
+
+
+                    var editModal = new bootstrap.Modal(document.getElementById('editAuftragModal'));
+                    editModal.show();
+                })
+                .catch(error => console.error("Error fetching Auftrag data:", error));
+        }
+
+        function saveEditAuftrag(auftragId) {
+            const updatedAuftrag = {
+                angestellter_id: document.getElementById("editAngestellter").value,
+                arbeitsort_id: document.getElementById("editArbeitsort").value,
+                arbeitsart_id: document.getElementById("editArbeitsart").value,
+                zeit: document.getElementById("editZeit").value,
+                fahrzeug_id: document.getElementById("editFahrzeug").value
+            };
+
+            fetch(`/update_auftrag/${auftragId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(updatedAuftrag)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error updating Auftrag");
+                }
+            })
+            .catch(error => console.error("Error updating Auftrag:", error));
+        }
+
+        function deleteAuftrag(auftragId) {
+            fetch(`/delete_auftrag/${auftragId}`, {
+                method: "DELETE"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error deleting Auftrag");
+                }
+            })
+            .catch(error => console.error("Error deleting Auftrag:", error));
+        }
+    </script>
+
+</body>
+</html>
